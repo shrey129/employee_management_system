@@ -112,7 +112,7 @@ def index():
     search_query = request.args.get('search')
     
     # 2. START with the base list (Always exclude Ghost Admin 9999)
-    query = employees.query.filter(employees.emp_id != 9999)
+    query = employees.query.filter(employees.emp_id != 1)
 
     # 3. IF searching, add extra "rules" to the query
     if search_query:
