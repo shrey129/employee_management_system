@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Attendance Log - {{ employee.name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container mt-5">
+    <h2>Attendance Log for {{ employee.name }}</h2>
+    <p>Employee ID: {{ employee.emp_id }}</p>
+
+    <div class="row mb-4 mt-3">
+        <div class="col-md-3">
+            <div class="card border-primary shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Total Working Days</h6>
+                    <h2 class="text-primary">{{ total }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-success shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Days Present</h6>
+                    <h2 class="text-success">{{ present }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-warning shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Leaves Taken</h6>
+                    <h2 class="text-warning">{{ leaves }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-info shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Attendance %</h6>
+                    <h2 class="text-info">{{ percentage }}%</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <table class="table table-bordered table-striped mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in logs %}
+            <tr>
+                <td>{{ log.work_date }}</td>
+                <td>
+                    <span class="badge bg-success">{{ log.status }}</span> 
+                </td>
+                <td>
+                    {% if current_user.role.name == 'admin' %}
+                    <a href="{{ url_for('delete_attendance', attendance_id=log.id) }}" 
+                        class="btn btn-sm btn-danger ms-3 shadow-sm" 
+                        onclick="return confirm('⚠️ Are you sure you want to remove this record?')">
+                        <i class="bi bi-trash"></i> Remove
+                    </a>
+                    {% else %}
+                    <span class="text-muted">View Only</span>
+
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="2" class="text-center text-muted">No attendance records found.</td>
+            </tr>
+            
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="/" class="btn btn-primary">Back to Dashboard</a>
+</body>
+</html>
