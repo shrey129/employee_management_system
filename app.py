@@ -12,15 +12,24 @@ app.config['SECRET_KEY'] = 'dev_key_123' # You can change this to any random str
 
 
 # Get the URL from the Environment Variable (Render)
-# If it's not found, it uses your hardcoded link as a backup
-database_url = os.environ.get('DATABASE_URL', 'postgresql://employee_db_fyrg_user:dbtQehBpsmwaVSMcyKvfK1oq2pN1HvbM@dpg-d7ie05n7f7vs7394ifhg-a/employee_db_fyrg')
+import os
 
-# This fixes the link if it starts with postgres://
-if database_url and database_url.startswith("postgres://"):
-    database_url = database_url.replace("postgres://", "postgresql://", 1)
+# 1. Get the URL
+raw_uri = os.environ.get('DATABASE_URL') or 'postgresql://employee_db_fyrg_user:dbtQehBpsmwaVSMcyKvfK1oq2pN1HvbM@dpg-d7ie05n7f7vs7394ifhg-a/employee_db_fyrg'
 
-app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+# 2. Clean it (Remove accidental spaces or quotes)
+uri = raw_uri.strip().replace('"', '').replace("'", "")
+
+# 3. Fix the prefix
+if uri.startswith("postgres://"):
+    uri = uri.replace("postgres://", "postgresql://", 1)
+
+# 4. Assign it
+app.config['SQLALCHEMY_DATABASE_URI'] = uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# This will help us debug in the Render logs!
+print(f"Connecting to database starting with: {uri[:15]}...")
 
 # 2. Initialize the DB with the App
 db.init_app(app)
