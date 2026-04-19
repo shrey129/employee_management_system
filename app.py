@@ -10,7 +10,16 @@ app.config['SECRET_KEY'] = 'dev_key_123' # You can change this to any random str
 # 1. Database Configuration
 # using config with my actual MySQL password
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL','postgresql://employee_db_fyrg_user:dbtQehBpsmwaVSMcyKvfK1oq2pN1HvbM@dpg-d7ie05n7f7vs7394ifhg-a/employee_db_fyrg', 1)
+
+# Get the URL from the Environment Variable (Render)
+# If it's not found, it uses your hardcoded link as a backup
+database_url = os.environ.get('DATABASE_URL', 'postgresql://employee_db_fyrg_user:dbtQehBpsmwaVSMcyKvfK1oq2pN1HvbM@dpg-d7ie05n7f7vs7394ifhg-a/employee_db_fyrg')
+
+# This fixes the link if it starts with postgres://
+if database_url and database_url.startswith("postgres://"):
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # 2. Initialize the DB with the App
