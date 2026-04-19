@@ -42,6 +42,32 @@ login_manager.login_view = 'login' # The name of your login route function
 # To check models.py and makes sure MySQL has the exact same tables.
 with app.app_context():
     db.create_all()
+    
+    # 1. Check if the employee table is empty
+    if not employees.query.first():
+        # Create a "dummy" employee for the admin to link to
+        admin_emp = employees(
+            name="System Admin",
+            email="admin@system.com",
+            dob=date(1990, 1, 1),
+            gender=GenderEnum.Male, # Make sure this matches your Enum class!
+            department="IT",
+            salary=0
+        )
+        db.session.add(admin_emp)
+        db.session.commit()
+        
+        # 2. Now create the User linked to that Employee
+        if not users.query.filter_by(username='admin').first():
+            admin_login = users(
+                username='admin', 
+                emp_id=admin_emp.emp_id, 
+                role=roleStatus.admin
+            )
+            admin_login.set_password('admin123') # Change this to your preferred password
+            db.session.add(admin_login)
+            db.session.commit()
+            print("Successfully created Admin Employee and User!")
 
 @login_manager.user_loader
 def load_user(user_id):
