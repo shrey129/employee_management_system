@@ -34,7 +34,7 @@ class employees(db.Model):
     department = db.Column(db.String(50))
     salary = db.Column(db.Numeric(10,2))
     date_joined = db.Column(db.Date, server_default = db.func.current_date())
-    gender = db.Column(db.Enum(GenderEnum), nullable = False)
+    gender = db.Column(db.Enum(GenderEnum, name = 'gender_enum'), nullable = False)
    
 class users(db.Model, UserMixin):
     __tablename__ = "users"
@@ -42,7 +42,7 @@ class users(db.Model, UserMixin):
     emp_id = db.Column (db.Integer, db.ForeignKey('employees.emp_id'), unique = True, nullable = False)
     username = db.Column(db.String(50), unique = True, nullable = False)
     password_hash = db.Column(db.String(255), nullable = False)
-    role = db.Column(db.Enum(roleStatus), nullable = False, default = roleStatus.employee)
+    role = db.Column(db.Enum(roleStatus, name = 'role_enum'), nullable = False, default = roleStatus.employee)
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
     def check_password(self, password):
@@ -52,5 +52,5 @@ class attendance(db.Model):
     __tablename__ = "attendance"
     id = db.Column(db.Integer, primary_key = True, autoincrement = True)
     emp_id = db.Column (db.Integer, db.ForeignKey('employees.emp_id'), nullable = False )
-    work_date = db.Column(db.Date, nullable = False , default = AttendanceStatus.Present )
-    status = db.Column(db.Enum('Present', 'Absent', 'Late', 'Leave'), nullable=False, default='Present')
+    work_date = db.Column(db.Date, nullable = False , default = date.today )
+    status = db.Column(db.Enum('Present', 'Absent', 'Late', 'Leave', name = 'attendance_status_enum'), nullable=False, default='Present')
