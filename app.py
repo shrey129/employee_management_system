@@ -42,6 +42,26 @@ login_manager.login_view = 'login' # The name of your login route function
 # To check models.py and makes sure MySQL has the exact same tables.
 with app.app_context():
     db.create_all()
+
+        # 1. Find the existing Admin Employee
+    admin_emp = employees.query.filter_by(email="admin@system.com").first()
+
+    if admin_emp:
+    # Update Gender
+        admin_emp.gender = GenderEnum.Female 
+        print("Updated Admin Gender to Female.")
+
+    # 2. Find the existing Admin User login
+        admin_login = users.query.filter_by(username='admin').first()
+
+    if admin_login:
+    # Update Password using your hashed method
+        admin_login.set_password('Admin@123')
+        print("Updated Admin Password to Admin@123.")
+
+    # 3. Save all changes to Render/PostgreSQL
+    db.session.commit()
+    print("All changes successfully pushed to the cloud database!")
     
     # 1. Check if the employee table is empty
 ''' if not employees.query.first():
@@ -69,27 +89,7 @@ with app.app_context():
             db.session.commit()
             print("Successfully created Admin Employee and User!")'''
     
-    # 1. Find the existing Admin Employee
-admin_emp = employees.query.filter_by(email="admin@system.com").first()
 
-if admin_emp:
-    # Update Gender
-    admin_emp.gender = GenderEnum.Female 
-    print("Updated Admin Gender to Female.")
-
-# 2. Find the existing Admin User login
-admin_login = users.query.filter_by(username='admin').first()
-
-if admin_login:
-    # Update Password using your hashed method
-    admin_login.set_password('Admin@123')
-    print("Updated Admin Password to Admin@123.")
-
-# 3. Save all changes to Render/PostgreSQL
-db.session.commit()
-print("All changes successfully pushed to the cloud database!")
-  
-    
 
 #-----------2) Authentication -----------
 @app.route('/login', methods = ['GET','POST'])
