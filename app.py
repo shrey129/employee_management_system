@@ -44,7 +44,7 @@ with app.app_context():
     db.create_all()
     
     # 1. Check if the employee table is empty
-    if not employees.query.first():
+''' if not employees.query.first():
         # Create a "dummy" employee for the admin to link to
         admin_emp = employees(
             name="System Admin",
@@ -67,16 +67,28 @@ with app.app_context():
             admin_login.set_password('admin123') # Change this to your preferred password
             db.session.add(admin_login)
             db.session.commit()
-            print("Successfully created Admin Employee and User!")
+            print("Successfully created Admin Employee and User!")'''
+    
+    # 1. Find the existing Admin Employee
+admin_emp = employees.query.filter_by(email="admin@system.com").first()
 
-@login_manager.user_loader
-def load_user(user_id):
-    if user_id is None:
-        return None
-    try:
-        return db.session.get(users,int(user_id))
-    except:
-        return None
+if admin_emp:
+    # Update Gender
+    admin_emp.gender = GenderEnum.Female 
+    print("Updated Admin Gender to Female.")
+
+# 2. Find the existing Admin User login
+admin_login = users.query.filter_by(username='admin').first()
+
+if admin_login:
+    # Update Password using your hashed method
+    admin_login.set_password('Admin@123')
+    print("Updated Admin Password to Admin@123.")
+
+# 3. Save all changes to Render/PostgreSQL
+db.session.commit()
+print("All changes successfully pushed to the cloud database!")
+  
     
 
 #-----------2) Authentication -----------
@@ -142,7 +154,7 @@ def add_employee():
     n = request.form.get('name').strip().title()
     e = request.form.get('email')
     birth_date = request.form.get('dob')
-    d = request.form.get('department')
+    d = request.form.get('department').strip().title()
     s = request.form.get('salary') or 0
     doj = request.form.get('date_joined')
     g = request.form.get('gender')
